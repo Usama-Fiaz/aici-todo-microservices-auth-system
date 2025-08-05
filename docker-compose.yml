@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # User Database
+  user-db:
+    image: postgres:15-alpine
+    container_name: user-db
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Todo Database
+  todo-db:
+    image: postgres:15-alpine
+    container_name: todo-db
+    environment:
+      POSTGRES_DB: todo_db
+      POSTGRES_USER: todo_user
+      POSTGRES_PASSWORD: todo_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - todo_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://user_user:user_password@user-db:5432/user_db
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+    depends_on:
+      - user-db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Todo Service
+  todo-service:
+    build:
+      context: ./todo-service
+      dockerfile: Dockerfile
+    container_name: todo-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DATABASE_URL=postgresql://todo_user:todo_password@todo-db:5432/todo_db
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+    depends_on:
+      - todo-db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_USER_SERVICE_URL=http://localhost:3001
+      - REACT_APP_TODO_SERVICE_URL=http://localhost:3002
+    depends_on:
+      - user-service
+      - todo-service
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  user_db_data:
+  todo_db_data:
+
+networks:
+  app-network:
+    driver: bridge 
