@@ -361,7 +361,3 @@ This project is licensed under the MIT License.
 - **Read Todos**: User-specific todo retrieval
 - **Update Todo**: Owner-only modification with validation
 - **Delete Todo**: Owner-only deletion with proper cleanup
-
----
-
-**Built with ❤️ using Node.js, TypeScript, PostgreSQL, React, and Docker** 
