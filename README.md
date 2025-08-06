@@ -301,7 +301,6 @@ todo-microservices-auth-system/
 │   ├── public/            # Static assets
 │   └── Dockerfile
 ├── docker-compose.yml     # Service orchestration
-├── start.sh              # Quick start script
 ├── API_DOCUMENTATION.md  # Detailed API docs
 └── README.md             # This file
 ```
