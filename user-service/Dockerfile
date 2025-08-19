@@ -45,9 +45,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodejs -u 1001
+# Create non-root user (Debian syntax)
+RUN groupadd --gid 1001 nodejs || true && \
+    useradd --uid 1001 --gid 1001 --system --create-home nodejs || true
 
 # Change ownership of the app directory
 RUN chown -R nodejs:nodejs /app
